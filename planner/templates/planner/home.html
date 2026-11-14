@@ -1,0 +1,102 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}Мой семестр — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">ЛИЧНОЕ ПРОСТРАНСТВО</span>
+    <h1>Мой семестр</h1>
+    <p>Организуй учёбу в своём ритме.</p>
+</header>
+
+<section class="hero">
+    <div>
+        <span class="hero-label">ТВОЁ УЧЕБНОЕ ПРОСТРАНСТВО</span>
+        <h2>Большие цели<br>начинаются с малого.</h2>
+        <p>Планируй. Выполняй. Достигай.</p>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+        <div class="paper">
+            <span>✓ ━━━</span>
+            <span>✓ ━━━</span>
+            <span>✓ ━━━</span>
+        </div>
+    </div>
+</section>
+
+<p class="demo-label">Предварительный обзор · Демонстрационные данные</p>
+
+<section class="statistics">
+    <div class="stat-card">
+        <span>Всего заданий</span>
+        <strong class="blue">12</strong>
+    </div>
+    <div class="stat-card">
+        <span>Выполнено</span>
+        <strong class="green">5</strong>
+    </div>
+    <div class="stat-card">
+        <span>В процессе</span>
+        <strong class="orange">6</strong>
+    </div>
+    <div class="stat-card">
+        <span>Просрочено</span>
+        <strong class="red">1</strong>
+    </div>
+</section>
+
+<section class="panel">
+    <div class="section-heading">
+        <h2>Прогресс семестра</h2>
+        <strong class="blue">42%</strong>
+    </div>
+    <div class="progress-bar">
+        <div class="progress-fill"></div>
+    </div>
+    <p class="muted">5 из 12 заданий выполнено</p>
+</section>
+
+<section class="panel" id="tasks">
+    <h2>Ближайшие дедлайны</h2>
+
+    <div class="task">
+        <div class="task-info">
+            <strong>Разработка веб-проекта</strong>
+            <p>Веб-разработка</p>
+        </div>
+        <span class="deadline">20 ноября</span>
+    </div>
+
+    <div class="task">
+        <div class="task-info">
+            <strong>Подготовка презентации</strong>
+            <p>Управление проектами</p>
+        </div>
+        <span class="deadline">23 ноября</span>
+    </div>
+
+    <div class="task">
+        <div class="task-info">
+            <strong>Анализ научной статьи</strong>
+            <p>Методология исследований</p>
+        </div>
+        <span class="deadline">25 ноября</span>
+    </div>
+</section>
+
+<section class="panel" id="subjects">
+    <h2>Мои дисциплины</h2>
+    <div class="subjects">
+        <span>Веб-разработка</span>
+        <span>Управление проектами</span>
+        <span>Методология исследований</span>
+    </div>
+</section>
+
+<footer class="page-footer">
+    Semestrika — твой семестр под контролем.
+</footer>
+
+{% endblock %}

@@ -1,0 +1,62 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Semestrika{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'planner/css/styles.css' %}">
+</head>
+<body>
+
+    <aside class="sidebar">
+        <a class="logo" href="{% url 'planner:home' %}">
+            <span class="logo-icon">S</span>
+            semestrika<span class="logo-dot">.</span>
+        </a>
+
+        <p class="menu-label">МОЙ СЕМЕСТР</p>
+
+        
+<nav class="navigation">
+    <a href="{% url 'planner:home' %}"
+       class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+        ▦ &nbsp; Обзор
+    </a>
+
+    <a href="{% url 'planner:tasks' %}"
+       class="{% if request.resolver_match.url_name == 'tasks' %}active{% endif %}">
+        ☷ &nbsp; Задания
+    </a>
+
+    <a href="{% url 'planner:subjects' %}"
+       class="{% if request.resolver_match.url_name == 'subjects' %}active{% endif %}">
+        ▤ &nbsp; Дисциплины
+    </a>
+
+    <a href="{% url 'planner:calendar' %}"
+       class="{% if request.resolver_match.url_name == 'calendar' %}active{% endif %}">
+        ▦ &nbsp; Календарь
+    </a>
+
+    <a href="{% url 'planner:radar' %}"
+       class="{% if request.resolver_match.url_name == 'radar' %}active{% endif %}">
+        ◎ &nbsp; Радар нагрузки
+    </a>
+</nav>
+
+
+        <div class="sidebar-footer">
+            <strong>Semestrika</strong>
+            <p>Твой семестр под контролем.</p>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+</body>
+</html>

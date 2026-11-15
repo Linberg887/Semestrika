@@ -26,12 +26,12 @@
     </a>
 
     <a href="{% url 'planner:tasks' %}"
-       class="{% if request.resolver_match.url_name == 'tasks' %}active{% endif %}">
+       class="{% if 'task' in request.resolver_match.url_name %}active{% endif %}">
         ☷ &nbsp; Задания
     </a>
 
     <a href="{% url 'planner:subjects' %}"
-       class="{% if request.resolver_match.url_name == 'subjects' %}active{% endif %}">
+       class="{% if 'subject' in request.resolver_match.url_name %}active{% endif %}">
         ▤ &nbsp; Дисциплины
     </a>
 

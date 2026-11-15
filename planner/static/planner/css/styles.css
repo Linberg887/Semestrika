@@ -568,3 +568,82 @@ h1 {
 .delete-warning p {
     color: #526881;
 }
+
+/* Карточки учебных дисциплин */
+
+.subject-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.subject-card {
+    display: block;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 26px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.subject-card:hover {
+    transform: translateY(-4px);
+    border-color: #b4cef2;
+    box-shadow: 0 8px 24px rgba(40, 104, 199, 0.12);
+}
+
+.subject-icon {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: #e4efff;
+    color: var(--primary);
+    font-size: 25px;
+}
+
+.subject-card h2 {
+    font-size: 20px;
+    margin: 18px 0 8px;
+    overflow-wrap: anywhere;
+}
+
+.subject-stats {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 24px 0 12px;
+}
+
+.subject-bottom {
+    border-top: 1px solid var(--border);
+    margin-top: 20px;
+    padding-top: 16px;
+    color: var(--primary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.subjects a {
+    background: #eaf2ff;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: var(--primary);
+    transition: background 0.2s;
+}
+
+.subjects a:hover {
+    background: var(--primary);
+    color: white;
+}
+
+@media (max-width: 900px) {
+    .subject-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,84 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}{{ subject.name }} — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">УЧЕБНАЯ ДИСЦИПЛИНА</span>
+    <h1>{{ subject.name }}</h1>
+    <p>{{ subject.teacher|default:"Преподаватель не указан" }}</p>
+</header>
+
+<section class="panel">
+    <h2>О дисциплине</h2>
+
+    {% if subject.description %}
+        {{ subject.description|linebreaks }}
+    {% else %}
+        <p class="muted">Описание пока не добавлено.</p>
+    {% endif %}
+</section>
+
+<section class="panel">
+    <h2>Учебные задания ({{ tasks|length }})</h2>
+
+    {% for task in tasks %}
+
+        <div class="task">
+            <div class="task-info">
+
+                <a class="task-link"
+                   href="{% url 'planner:task_detail' task.id %}">
+                    <strong>{{ task.title }}</strong>
+                </a>
+
+                <p>Время выполнения: {{ task.estimated_hours }} ч.</p>
+
+            </div>
+
+            <div class="task-meta">
+
+                <span class="deadline">
+                    {{ task.deadline|date:"d.m.Y" }}
+                </span>
+
+                {% if task.status == 'completed' %}
+                    <span class="green">Выполнено</span>
+                {% elif task.deadline < today %}
+                    <span class="red">Просрочено</span>
+                {% else %}
+                    <span class="orange">{{ task.get_status_display }}</span>
+                {% endif %}
+
+            </div>
+        </div>
+
+    {% empty %}
+
+        <p class="muted">По этой дисциплине пока нет заданий.</p>
+
+    {% endfor %}
+
+</section>
+
+<div class="task-actions">
+
+    <a class="btn-primary"
+       href="{% url 'planner:subject_update' subject.id %}">
+        Редактировать
+    </a>
+
+    <a class="btn-danger"
+       href="{% url 'planner:subject_delete' subject.id %}">
+        Удалить
+    </a>
+
+    <a class="btn-secondary" href="{% url 'planner:subjects' %}">
+        ← Все дисциплины
+    </a>
+
+</div>
+
+{% endblock %}

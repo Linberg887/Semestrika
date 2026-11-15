@@ -1,0 +1,73 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}Мои дисциплины — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">УЧЕБНЫЙ ПЛАН</span>
+    <h1>Мои дисциплины</h1>
+    <p>Организуй учебные предметы в одном месте.</p>
+</header>
+
+<div class="page-actions">
+    <a class="btn-primary" href="{% url 'planner:subject_create' %}">
+        + Новая дисциплина
+    </a>
+</div>
+
+<div class="subject-grid">
+
+    {% for subject in subjects %}
+
+        <a class="subject-card"
+           href="{% url 'planner:subject_detail' subject.id %}">
+
+            <div class="subject-icon">▤</div>
+
+            <h2>{{ subject.name }}</h2>
+
+            <p class="muted">
+                {{ subject.teacher|default:"Преподаватель не указан" }}
+            </p>
+
+            <div class="subject-stats">
+                <span>Заданий: {{ subject.task_count }}</span>
+                <span>Выполнено: {{ subject.completed_count }}</span>
+            </div>
+
+            {% if subject.task_count %}
+                {% widthratio subject.completed_count subject.task_count 100 as progress %}
+            {% else %}
+                {% widthratio 0 1 100 as progress %}
+            {% endif %}
+
+            <div class="progress-bar">
+                <div class="progress-fill"
+                     style="width: {{ progress }}%;"></div>
+            </div>
+
+            <p class="muted">Прогресс: {{ progress }}%</p>
+
+            <div class="subject-bottom">
+                Подробнее →
+            </div>
+
+        </a>
+
+    {% empty %}
+
+        <section class="panel">
+            <h2>Пока нет дисциплин</h2>
+            <p class="muted">Добавь свой первый учебный предмет.</p>
+            <a class="btn-primary" href="{% url 'planner:subject_create' %}">
+                Добавить дисциплину
+            </a>
+        </section>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

@@ -104,7 +104,9 @@
 
     <div class="subjects">
         {% for subject in subjects %}
-            <span>{{ subject.name }}</span>
+           <a href="{% url 'planner:subject_detail' subject.id %}">
+    {{ subject.name }}
+</a>
         {% empty %}
             <p class="muted">Дисциплины пока не добавлены.</p>
         {% endfor %}

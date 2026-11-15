@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import Task
+from .models import Task, Subject
 
 
 class TaskForm(forms.ModelForm):
@@ -34,5 +34,29 @@ class TaskForm(forms.ModelForm):
             'estimated_hours': (
                 'Укажи примерное время от 0,5 до 100 часов. '
                 'Оно используется для расчёта учебной нагрузки.'
+            ),
+        }
+
+
+
+class SubjectForm(forms.ModelForm):
+    class Meta:
+        model = Subject
+
+        fields = [
+            'name',
+            'teacher',
+            'description',
+        ]
+
+        widgets = {
+            'name': forms.TextInput(
+                attrs={'placeholder': 'Например, финансовый менеджмент'}
+            ),
+            'teacher': forms.TextInput(
+                attrs={'placeholder': 'ФИО преподавателя'}
+            ),
+            'description': forms.Textarea(
+                attrs={'rows': 4}
             ),
         }

@@ -1,0 +1,45 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}{{ title }} — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">УЧЕБНЫЙ ПЛАН</span>
+    <h1>{{ title }}</h1>
+    <p>Создавай своё учебное пространство.</p>
+</header>
+
+<section class="panel form-panel">
+
+    <form method="post" class="task-form">
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+
+            <div class="form-field">
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+            </div>
+
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                Сохранить дисциплину
+            </button>
+
+            <a class="btn-secondary" href="{% url 'planner:subjects' %}">
+                Отмена
+            </a>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

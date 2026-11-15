@@ -1,0 +1,60 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}Удаление дисциплины — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">УПРАВЛЕНИЕ ДИСЦИПЛИНАМИ</span>
+    <h1>Удаление дисциплины</h1>
+</header>
+
+<section class="panel form-panel">
+
+    <div class="delete-warning">
+
+        {% if task_count %}
+
+            <h2>Удаление невозможно</h2>
+
+            <p>С дисциплиной «{{ subject.name }}» связано
+                учебных заданий: {{ task_count }}.</p>
+
+            <p>Сначала перенеси их в другую дисциплину
+                или удали соответствующие задания.</p>
+
+        {% else %}
+
+            <h2>Удалить дисциплину?</h2>
+            <p>{{ subject.name }}</p>
+            <p>Это действие нельзя будет отменить.</p>
+
+        {% endif %}
+
+    </div>
+
+    <form method="post">
+
+        {% csrf_token %}
+
+        <div class="form-actions">
+
+            {% if not task_count %}
+                <button type="submit" class="btn-danger">
+                    Да, удалить
+                </button>
+            {% endif %}
+
+            <a class="btn-secondary"
+               href="{% url 'planner:subject_detail' subject.id %}">
+                Назад
+            </a>
+
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

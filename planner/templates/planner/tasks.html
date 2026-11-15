@@ -10,59 +10,195 @@
     <h1>Мои задания</h1>
     <p>Планируй задания и контролируй сроки сдачи.</p>
 </header>
+
 <div class="page-actions">
     <a class="btn-primary" href="{% url 'planner:task_create' %}">
         + Новое задание
     </a>
 </div>
-<div class="task-filters">
-    <a class="deadline" href="{% url 'planner:tasks' %}">
-        Все задания
-    </a>
-    <a class="deadline" href="?status=completed">
-        Выполнено
-    </a>
-    <a class="deadline" href="?status=active">
-        К выполнению
-    </a>
-    <a class="deadline" href="?status=overdue">
-        Просрочено
-    </a>
-</div>
 
 <section class="panel">
-    <h2>Список учебных заданий</h2>
+
+    <h2>Поиск и фильтры</h2>
+
+    <form method="get" class="filter-form">
+
+        <div class="form-field search-field">
+            <label>Поиск задания</label>
+            <input type="search" name="q"
+                   value="{{ search }}"
+                   placeholder="Введи название или описание задания...">
+        </div>
+
+        <div class="filter-grid">
+
+            <div class="form-field">
+                <label>Дисциплина</label>
+
+                <select name="subject">
+                    <option value="">Все дисциплины</option>
+
+                    {% for subject in subjects %}
+                        <option value="{{ subject.id }}"
+                            {% if subject.id|stringformat:"s" == selected_subject %}
+                                selected
+                            {% endif %}>
+                            {{ subject.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label>Статус</label>
+
+                <select name="status">
+                    <option value="all">Все задания</option>
+
+                    <option value="active"
+                        {% if selected == 'active' %}selected{% endif %}>
+                        К выполнению
+                    </option>
+
+                    <option value="completed"
+                        {% if selected == 'completed' %}selected{% endif %}>
+                        Выполнено
+                    </option>
+
+                    <option value="overdue"
+                        {% if selected == 'overdue' %}selected{% endif %}>
+                        Просрочено
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label>Приоритет</label>
+
+                <select name="priority">
+                    <option value="">Все приоритеты</option>
+
+                    <option value="high"
+                        {% if selected_priority == 'high' %}selected{% endif %}>
+                        Высокий
+                    </option>
+
+                    <option value="medium"
+                        {% if selected_priority == 'medium' %}selected{% endif %}>
+                        Средний
+                    </option>
+
+                    <option value="low"
+                        {% if selected_priority == 'low' %}selected{% endif %}>
+                        Низкий
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label>Сортировка</label>
+
+                <select name="sort">
+                    <option value="nearest">
+                        Сначала ближайшие
+                    </option>
+
+                    <option value="latest"
+                        {% if selected_sort == 'latest' %}selected{% endif %}>
+                        Сначала дальние
+                    </option>
+
+                    <option value="name"
+                        {% if selected_sort == 'name' %}selected{% endif %}>
+                        По названию
+                    </option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                Применить фильтры
+            </button>
+
+            <a class="btn-secondary" href="{% url 'planner:tasks' %}">
+                Сбросить
+            </a>
+        </div>
+
+    </form>
+</section>
+
+<section class="panel">
+
+    <div class="section-heading">
+        <h2>Учебные задания</h2>
+        <span class="muted">Найдено: {{ tasks|length }}</span>
+    </div>
 
     {% for task in tasks %}
+
         <div class="task">
+
             <div class="task-info">
-                <a class="task-link" href="{% url 'planner:task_detail' task.id %}">
-    <strong>{{ task.title }}</strong>
-</a>
+
+                <a class="task-link"
+                   href="{% url 'planner:task_detail' task.id %}">
+                    <strong>{{ task.title }}</strong>
+                </a>
+
                 <p>{{ task.subject.name }}</p>
+
                 <p>Приоритет: {{ task.get_priority_display }}</p>
+
                 <p>Время выполнения: {{ task.estimated_hours }} ч.</p>
+
             </div>
 
             <div class="task-meta">
+
                 <span class="deadline">
                     {{ task.deadline|date:"d.m.Y" }}
                 </span>
 
                 {% if task.status == 'completed' %}
                     <span class="green">Выполнено</span>
+
                 {% elif task.deadline < today %}
                     <span class="red">Просрочено</span>
+
                 {% else %}
                     <span class="orange">
                         {{ task.get_status_display }}
                     </span>
                 {% endif %}
+
+                <a class="task-link"
+                   href="{% url 'planner:task_detail' task.id %}">
+                    Подробнее →
+                </a>
+
             </div>
+
         </div>
+
     {% empty %}
-        <p class="muted">В этой категории пока нет заданий.</p>
+
+        <div class="empty-state">
+            <div class="empty-icon">⌕</div>
+            <h2>Задания не найдены</h2>
+            <p class="muted">
+                Попробуй изменить параметры поиска или сбросить фильтры.
+            </p>
+
+            <a class="btn-secondary" href="{% url 'planner:tasks' %}">
+                Показать все задания
+            </a>
+        </div>
+
     {% endfor %}
+
 </section>
 
 {% endblock %}

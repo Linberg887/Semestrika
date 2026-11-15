@@ -12,34 +12,63 @@
 </header>
 
 <section class="panel form-panel">
-    <form method="post" class="task-form">
-        {% csrf_token %}
 
-        {{ form.non_field_errors }}
+    {% if not form.fields.subject.queryset.exists %}
 
-        {% for field in form %}
-            <div class="form-field">
-                {{ field.label_tag }}
-                {{ field }}
+        <div class="empty-state">
+            <div class="empty-icon">▤</div>
 
-                {% if field.help_text %}
-                    <p class="muted">{{ field.help_text }}</p>
-                {% endif %}
+            <h2>Начни с учебной дисциплины</h2>
 
-                {{ field.errors }}
-            </div>
-        {% endfor %}
+            <p class="muted">
+                Чтобы добавить задание, сначала создай
+                хотя бы одну учебную дисциплину.
+            </p>
 
-        <div class="form-actions">
-            <button type="submit" class="btn-primary">
-                Сохранить задание
-            </button>
-
-            <a class="btn-secondary" href="{% url 'planner:tasks' %}">
-                Отмена
+            <a class="btn-primary"
+               href="{% url 'planner:subject_create' %}">
+                + Создать дисциплину
             </a>
         </div>
-    </form>
+
+    {% else %}
+
+        <form method="post" class="task-form">
+
+            {% csrf_token %}
+
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+
+                <div class="form-field">
+                    {{ field.label_tag }}
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <p class="muted">{{ field.help_text }}</p>
+                    {% endif %}
+
+                    {{ field.errors }}
+                </div>
+
+            {% endfor %}
+
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    Сохранить задание
+                </button>
+
+                <a class="btn-secondary"
+                   href="{% url 'planner:tasks' %}">
+                    Отмена
+                </a>
+            </div>
+
+        </form>
+
+    {% endif %}
+
 </section>
 
 {% endblock %}

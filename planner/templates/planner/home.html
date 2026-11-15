@@ -7,9 +7,24 @@
 
 <header class="page-header">
     <span class="eyebrow">ЛИЧНОЕ ПРОСТРАНСТВО</span>
-    <h1>Мой семестр</h1>
-    <p>Организуй учёбу в своём ритме.</p>
+    <h1>Привет, {{ request.user.student_profile.display_name|default:request.user.username }}!</h1>
+<p>Твой семестр под контролем.</p>
 </header>
+
+<div class="dashboard-actions">
+
+    <a class="btn-primary"
+       href="{% url 'planner:task_create' %}">
+        + Новое задание
+    </a>
+
+    <a class="btn-secondary"
+       href="{% url 'planner:radar' %}">
+        ◎ Проверить нагрузку
+    </a>
+
+</div>
+
 <div class="page-actions">
     <a class="btn-primary" href="{% url 'planner:task_create' %}">
         + Новое задание

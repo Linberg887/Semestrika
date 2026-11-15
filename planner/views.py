@@ -46,40 +46,68 @@ def home(request):
     })
 
 
+
 @login_required
 def tasks(request):
     today = timezone.localdate()
     task_list = user_tasks(request)
     subject_list = user_subjects(request)
+
     search = request.GET.get('q', '').strip()
     selected = request.GET.get('status', 'all')
     selected_subject = request.GET.get('subject', '')
     selected_priority = request.GET.get('priority', '')
     selected_sort = request.GET.get('sort', 'nearest')
 
-    if search:
-        task_list = task_list.filter(Q(title__icontains=search) | Q(description__icontains=search))
     if selected == 'completed':
         task_list = task_list.filter(status='completed')
+
     elif selected == 'active':
-        task_list = task_list.exclude(status='completed').filter(deadline__gte=today)
+        task_list = task_list.exclude(status='completed').filter(
+            deadline__gte=today
+        )
+
     elif selected == 'overdue':
-        task_list = task_list.exclude(status='completed').filter(deadline__lt=today)
+        task_list = task_list.exclude(status='completed').filter(
+            deadline__lt=today
+        )
+
     if selected_subject in {str(s.pk) for s in subject_list}:
         task_list = task_list.filter(subject_id=selected_subject)
+
     if selected_priority in ['low', 'medium', 'high']:
         task_list = task_list.filter(priority=selected_priority)
+
     if selected_sort == 'latest':
         task_list = task_list.order_by('-deadline', 'title')
+
     elif selected_sort == 'name':
         task_list = task_list.order_by('title')
+
     else:
         task_list = task_list.order_by('deadline', 'title')
+
+    # Поиск без учёта регистра, включая кириллицу
+    if search:
+        query = search.casefold()
+
+        task_list = [
+            task for task in task_list
+            if query in task.title.casefold()
+            or query in task.description.casefold()
+        ]
+
     return render(request, 'planner/tasks.html', {
-        'tasks': task_list, 'subjects': subject_list, 'today': today,
-        'search': search, 'selected': selected, 'selected_subject': selected_subject,
-        'selected_priority': selected_priority, 'selected_sort': selected_sort,
+        'tasks': task_list,
+        'subjects': subject_list,
+        'today': today,
+        'search': search,
+        'selected': selected,
+        'selected_subject': selected_subject,
+        'selected_priority': selected_priority,
+        'selected_sort': selected_sort,
     })
+
 
 
 @login_required
@@ -202,21 +230,40 @@ def radar(request):
     })
 
 
+
 @login_required
 def task_create(request):
     if request.method == 'POST':
         form = TaskForm(request.POST, user=request.user)
+
         if form.is_valid():
             task = form.save()
             return redirect('planner:task_detail', task_id=task.pk)
+
     else:
         initial = {}
+
         try:
-            initial['deadline'] = date.fromisoformat(request.GET.get('deadline', ''))
+            initial['deadline'] = date.fromisoformat(
+                request.GET.get('deadline', '')
+            )
         except ValueError:
             pass
+
+        subject_id = request.GET.get('subject', '')
+
+        if subject_id in {
+            str(subject.pk) for subject in user_subjects(request)
+        }:
+            initial['subject'] = subject_id
+
         form = TaskForm(initial=initial, user=request.user)
-    return render(request, 'planner/task_form.html', {'form': form, 'title': 'Новое задание'})
+
+    return render(request, 'planner/task_form.html', {
+        'form': form,
+        'title': 'Новое задание',
+    })
+
 
 
 @login_required

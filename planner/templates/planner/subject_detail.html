@@ -22,7 +22,18 @@
 </section>
 
 <section class="panel">
+    
+<div class="section-heading subject-task-heading">
+
     <h2>Учебные задания ({{ tasks|length }})</h2>
+
+    <a class="btn-primary"
+       href="{% url 'planner:task_create' %}?subject={{ subject.id }}">
+        + Новое задание
+    </a>
+
+</div>
+
 
     {% for task in tasks %}
 

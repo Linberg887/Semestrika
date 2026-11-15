@@ -4,6 +4,12 @@ from .models import Task, Subject
 
 
 class TaskForm(forms.ModelForm):
+    def __init__(self, *args, user, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['subject'].queryset = Subject.objects.filter(
+            owner=user
+        )
+
     class Meta:
         model = Task
 
@@ -36,7 +42,6 @@ class TaskForm(forms.ModelForm):
                 'Оно используется для расчёта учебной нагрузки.'
             ),
         }
-
 
 
 class SubjectForm(forms.ModelForm):

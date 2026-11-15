@@ -1,9 +1,17 @@
-
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.conf import settings
 
 
 class Subject(models.Model):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name='subjects',
+        verbose_name='Владелец',
+        null=False
+    )
+
     name = models.CharField('Название', max_length=150)
     teacher = models.CharField(
         'Преподаватель', max_length=150, blank=True
@@ -17,8 +25,6 @@ class Subject(models.Model):
         verbose_name = 'Дисциплина'
         verbose_name_plural = 'Дисциплины'
         ordering = ['name']
-
-
 class Task(models.Model):
 
     STATUS_CHOICES = [

@@ -1,0 +1,108 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        {% if is_register %}Регистрация{% else %}Вход{% endif %}
+        — Semestrika
+    </title>
+    <link rel="stylesheet" href="{% static 'planner/css/styles.css' %}">
+</head>
+
+<body class="auth-page">
+
+    <div class="auth-container">
+
+        <a class="logo auth-logo" href="{% url 'planner:home' %}">
+            <span class="logo-icon">S</span>
+            semestrika<span class="logo-dot">.</span>
+        </a>
+
+        <section class="auth-card">
+
+            {% if is_register %}
+
+                <span class="eyebrow">НОВОЕ НАЧАЛО</span>
+                <h1>Начни свой семестр</h1>
+                <p class="muted">Создай личное учебное пространство.</p>
+
+            {% else %}
+
+                <span class="eyebrow">ЛИЧНОЕ ПРОСТРАНСТВО</span>
+                <h1>С возвращением!</h1>
+                <p class="muted">Войди в свой аккаунт Semestrika.</p>
+
+            {% endif %}
+
+            <form method="post" class="task-form">
+
+                {% csrf_token %}
+
+                {{ form.non_field_errors }}
+
+                {% for field in form %}
+
+                    <div class="form-field">
+
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {{ field.errors }}
+
+                        {% if field.help_text %}
+                            <div class="auth-help">
+                                {{ field.help_text|safe }}
+                            </div>
+                        {% endif %}
+
+                    </div>
+
+                {% endfor %}
+
+                {% if next %}
+                    <input type="hidden" name="next" value="{{ next }}">
+                {% endif %}
+
+                <button type="submit" class="btn-primary">
+
+                    {% if is_register %}
+                        Создать аккаунт
+                    {% else %}
+                        Войти в Semestrika
+                    {% endif %}
+
+                </button>
+
+            </form>
+
+            <div class="auth-switch">
+
+                {% if is_register %}
+
+                    Уже есть аккаунт?
+                    <a href="{% url 'planner:login' %}">Войти</a>
+
+                {% else %}
+
+                    Нет аккаунта?
+                    <a href="{% url 'planner:register' %}">
+                        Зарегистрироваться
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+        <footer class="page-footer">
+            Semestrika — твой семестр под контролем.
+        </footer>
+
+    </div>
+
+</body>
+</html>

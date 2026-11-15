@@ -1,0 +1,276 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}Semestrika Radar{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">ИНТЕЛЛЕКТУАЛЬНОЕ ПЛАНИРОВАНИЕ</span>
+    <h1>Semestrika Radar</h1>
+    <p>Предусмотри нагрузку заранее.</p>
+</header>
+
+<section class="hero radar-hero">
+    <div>
+        <span class="hero-label">ТВОЙ ЛИЧНЫЙ ПОМОЩНИК</span>
+        <h2>Управляй временем,<br>а не дедлайнами.</h2>
+        <p>Анализируй нагрузку и планируй учёбу без спешки.</p>
+    </div>
+
+    <div class="radar-symbol" aria-hidden="true">◎</div>
+</section>
+
+<section class="panel radar-settings">
+    <h2>Настрой свою нагрузку</h2>
+
+    <p class="muted">
+        Сколько часов в день ты готов уделять учебным заданиям?
+    </p>
+
+    <form method="get" class="radar-form">
+
+        <div class="form-field">
+            <label for="daily-hours">Часов в день</label>
+
+            <input type="number"
+                   id="daily-hours"
+                   name="hours"
+                   min="1"
+                   max="12"
+                   value="{{ daily_limit }}"
+                   required>
+        </div>
+
+        <button type="submit" class="btn-primary">
+            Рассчитать нагрузку
+        </button>
+
+    </form>
+</section>
+
+<p class="muted">
+    Период анализа:
+    {{ today|date:"d.m.Y" }} — {{ end_date|date:"d.m.Y" }}
+</p>
+
+<section class="statistics">
+
+    <div class="stat-card">
+        <span>Общая нагрузка</span>
+        <strong class="blue">{{ total_hours|floatformat:"-1" }} ч.</strong>
+    </div>
+
+    <div class="stat-card">
+        <span>Доступное время</span>
+        <strong class="green">{{ available_hours|floatformat:"-1" }} ч.</strong>
+    </div>
+
+    <a class="stat-card"
+       href="{% url 'planner:tasks' %}?status=overdue">
+
+        <span>Просроченные задания</span>
+        <strong class="red">{{ overdue_hours|floatformat:"-1" }} ч.</strong>
+
+    </a>
+
+    <div class="stat-card">
+        <span>Пиковая нагрузка</span>
+        <strong class="orange">{{ peak.due_hours|floatformat:"-1" }} ч.</strong>
+    </div>
+
+</section>
+
+<section class="panel">
+
+    <h2>Нагрузка по ближайшим дедлайнам</h2>
+
+    <p class="muted">
+        Сколько часов работы приходится на каждую дату сдачи.
+    </p>
+
+    <div class="radar-chart">
+
+        {% for day in days %}
+
+            <div class="radar-row">
+
+                <div class="radar-date">
+                    <strong>{{ day.date|date:"D"|capfirst }}</strong>
+                    <span>{{ day.date|date:"d.m" }}</span>
+                </div>
+
+                <div class="radar-track">
+
+                    <div class="radar-bar
+                         {% if day.overload %}radar-overload{% endif %}"
+                         style="width: {{ day.bar_width }}%;">
+                    </div>
+
+                    <div class="radar-limit"
+                         style="left: {{ limit_width }}%;">
+                    </div>
+
+                </div>
+
+                <strong class="radar-value">
+                    {{ day.due_hours|floatformat:"-1" }} ч.
+                </strong>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    <div class="calendar-legend">
+        <span><i class="legend-active"></i> Обычная нагрузка</span>
+        <span><i class="legend-overdue"></i> Высокая нагрузка</span>
+        <span>┊ Дневной лимит</span>
+    </div>
+
+</section>
+
+<section class="panel">
+
+    <h2>Рекомендации Semestrika Radar</h2>
+
+    {% if not total_hours %}
+
+        <div class="radar-notice notice-success">
+            <h3>Свободная неделя</h3>
+            <p>На ближайшие семь дней нет невыполненных
+                заданий и просроченных работ.</p>
+        </div>
+
+    {% elif max_shortfall %}
+
+        <div class="radar-notice notice-danger">
+            <h3>⚠ Риск несоблюдения дедлайнов</h3>
+
+            <p>При текущем дневном лимите к отдельным срокам
+                сдачи может не хватить до
+                <strong>{{ max_shortfall|floatformat:"-1" }} ч.</strong></p>
+
+            <p>Попробуй увеличить доступное время
+                или пересмотреть сроки выполнения заданий.</p>
+        </div>
+
+    {% elif peak.due_hours > daily_limit %}
+
+        <div class="radar-notice notice-warning">
+            <h3>⚠ Ожидается высокая нагрузка</h3>
+
+            <p>На {{ peak.date|date:"d.m.Y" }} приходится
+                {{ peak.due_hours|floatformat:"-1" }} ч. работы.</p>
+
+            <p>Начни выполнять задания заранее.
+                Используй рекомендуемый план ниже.</p>
+        </div>
+
+    {% else %}
+
+        <div class="radar-notice notice-success">
+            <h3>✓ Нагрузка под контролем</h3>
+
+            <p>При текущем дневном лимите времени достаточно
+                для выполнения предстоящих заданий.</p>
+        </div>
+
+    {% endif %}
+
+    {% if overdue_hours %}
+
+        <div class="radar-notice notice-warning">
+            <h3>Обрати внимание на просроченные задания</h3>
+
+            <p>Для их выполнения потребуется примерно
+                {{ overdue_hours|floatformat:"-1" }} ч.
+                Они поставлены в начало рекомендуемого плана.</p>
+
+            <a class="task-link"
+               href="{% url 'planner:tasks' %}?status=overdue">
+                Посмотреть просроченные задания →
+            </a>
+        </div>
+
+    {% endif %}
+
+</section>
+
+<section class="panel">
+
+    <h2>Твой рекомендуемый план на неделю</h2>
+
+    <p class="muted">
+        Задания распределены по дням с учётом сроков сдачи
+        и доступного времени.
+    </p>
+
+    <div class="radar-plan">
+
+        {% for day in days %}
+
+            <div class="plan-day">
+
+                <div class="plan-heading">
+                    <strong>
+                        {{ day.date|date:"l"|capfirst }},
+                        {{ day.date|date:"d.m" }}
+                    </strong>
+
+                    <span class="deadline">
+                        {{ day.planned_hours|floatformat:"-1" }} ч.
+                    </span>
+                </div>
+
+                {% for item in day.plan %}
+
+                    <a class="plan-task"
+                       href="{% url 'planner:task_detail' item.task.id %}">
+
+                        <div>
+                            <strong>{{ item.task.title }}</strong>
+                            <p class="muted">
+                                {{ item.task.subject.name }}
+                            </p>
+
+                            {% if item.late %}
+                                <p class="red muted">
+                                    После срока сдачи
+                                </p>
+                            {% endif %}
+                        </div>
+
+                        <span class="blue">
+                            {{ item.hours|floatformat:"-1" }} ч.
+                        </span>
+
+                    </a>
+
+                {% empty %}
+
+                    <p class="muted">День без запланированной нагрузки.</p>
+
+                {% endfor %}
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% if remaining_hours %}
+        <div class="radar-notice notice-danger">
+            <p>В недельный план не удалось вместить
+                {{ remaining_hours|floatformat:"-1" }} ч. работы.</p>
+        </div>
+    {% endif %}
+
+</section>
+
+<footer class="page-footer">
+    Semestrika Radar — планируй с умом.
+</footer>
+
+{% endblock %}

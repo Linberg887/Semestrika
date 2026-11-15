@@ -7,6 +7,7 @@ from django.db.models.deletion import ProtectedError
 from django.views.decorators.http import require_POST
 from calendar import Calendar
 from datetime import date, timedelta
+from decimal import Decimal
 def home(request):
     today = timezone.localdate()
 
@@ -182,12 +183,153 @@ def calendar(request):
     })
 
 
+
 def radar(request):
-    return render(request, 'planner/section.html', {
-        'title': 'Semestrika Radar',
-        'description': 'Предусмотри нагрузку заранее.',
-        'message': 'Здесь будет отображаться анализ учебной нагрузки.',
+    today = timezone.localdate()
+    end_date = today + timedelta(days=6)
+
+    try:
+        daily_limit = int(request.GET.get('hours', 4))
+    except (ValueError, TypeError):
+        daily_limit = 4
+
+    daily_limit = max(1, min(12, daily_limit))
+
+    capacity = Decimal(daily_limit)
+    zero = Decimal('0')
+
+    # Получаем невыполненные задания
+    unfinished = list(
+        Task.objects.select_related('subject')
+        .exclude(status='completed')
+        .filter(deadline__lte=end_date)
+        .order_by('deadline', 'title', 'pk')
+    )
+
+    overdue_tasks = [
+        task for task in unfinished
+        if task.deadline < today
+    ]
+
+    upcoming_tasks = [
+        task for task in unfinished
+        if task.deadline >= today
+    ]
+
+    overdue_hours = sum(
+        (task.estimated_hours for task in overdue_tasks),
+        zero
+    )
+
+    total_hours = sum(
+        (task.estimated_hours for task in unfinished),
+        zero
+    )
+
+    available_hours = capacity * 7
+
+    # Очередь заданий по срокам сдачи
+    queue = [
+        {
+            'task': task,
+            'remaining': task.estimated_hours,
+        }
+        for task in unfinished
+    ]
+
+    position = 0
+    cumulative_hours = overdue_hours
+    days = []
+
+    # Анализируем ближайшие семь дней
+    for offset in range(7):
+        current_date = today + timedelta(days=offset)
+
+        day_tasks = [
+            task for task in upcoming_tasks
+            if task.deadline == current_date
+        ]
+
+        due_hours = sum(
+            (task.estimated_hours for task in day_tasks),
+            zero
+        )
+
+        cumulative_hours += due_hours
+
+        shortfall = max(
+            zero,
+            cumulative_hours - capacity * (offset + 1)
+        )
+
+        # Формируем рекомендуемый план
+        budget = capacity
+        plan = []
+
+        while budget > 0 and position < len(queue):
+            item = queue[position]
+            hours = min(budget, item['remaining'])
+
+            plan.append({
+                'task': item['task'],
+                'hours': hours,
+                'late': item['task'].deadline < current_date,
+            })
+
+            item['remaining'] -= hours
+            budget -= hours
+
+            if item['remaining'] == 0:
+                position += 1
+
+        days.append({
+            'date': current_date,
+            'due_hours': due_hours,
+            'task_count': len(day_tasks),
+            'overload': due_hours > capacity,
+            'shortfall': shortfall,
+            'planned_hours': capacity - budget,
+            'plan': plan,
+        })
+
+    peak = max(days, key=lambda day: day['due_hours'])
+
+    max_shortfall = max(
+        day['shortfall'] for day in days
+    )
+
+    remaining_hours = sum(
+        (item['remaining'] for item in queue),
+        zero
+    )
+
+    # Рассчитываем размеры столбцов графика
+    chart_max = max(
+        [capacity] + [day['due_hours'] for day in days]
+    )
+
+    limit_width = int(capacity / chart_max * 100)
+
+    for day in days:
+        day['bar_width'] = int(
+            day['due_hours'] / chart_max * 100
+        )
+
+    return render(request, 'planner/radar.html', {
+        'today': today,
+        'end_date': end_date,
+        'daily_limit': daily_limit,
+        'total_hours': total_hours,
+        'available_hours': available_hours,
+        'overdue_hours': overdue_hours,
+        'overdue_tasks': overdue_tasks,
+        'days': days,
+        'peak': peak,
+        'max_shortfall': max_shortfall,
+        'remaining_hours': remaining_hours,
+        'limit_width': limit_width,
     })
+
 
 
 

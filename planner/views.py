@@ -5,6 +5,8 @@ from .forms import TaskForm, SubjectForm
 from django.db.models import Count, Q
 from django.db.models.deletion import ProtectedError
 from django.views.decorators.http import require_POST
+from calendar import Calendar
+from datetime import date, timedelta
 def home(request):
     today = timezone.localdate()
 
@@ -105,11 +107,78 @@ def subjects(request):
     })
 
 
+
 def calendar(request):
-    return render(request, 'planner/section.html', {
-        'title': 'Учебный календарь',
-        'description': 'Не упускай важные даты.',
-        'message': 'Здесь появится календарь учебных заданий.',
+    today = timezone.localdate()
+
+    try:
+        year = int(request.GET.get('year', today.year))
+        month = int(request.GET.get('month', today.month))
+
+        if not 1900 <= year <= 2100:
+            raise ValueError
+
+        first_day = date(year, month, 1)
+
+    except ValueError:
+        year = today.year
+        month = today.month
+        first_day = today.replace(day=1)
+
+    previous_month = (
+        first_day - timedelta(days=1)
+    ).replace(day=1)
+
+    next_month = (
+        first_day.replace(day=28) + timedelta(days=4)
+    ).replace(day=1)
+
+    default_day = today.day if (
+        year == today.year and month == today.month
+    ) else 1
+
+    try:
+        selected_date = date(
+            year, month,
+            int(request.GET.get('day', default_day))
+        )
+    except ValueError:
+        selected_date = date(year, month, default_day)
+
+    monthly_tasks = Task.objects.select_related('subject').filter(
+        deadline__gte=first_day,
+        deadline__lt=next_month
+    ).order_by('deadline', 'title')
+
+    tasks_by_date = {}
+
+    for task in monthly_tasks:
+        tasks_by_date.setdefault(task.deadline, []).append(task)
+
+    weeks = []
+
+    for week in Calendar(firstweekday=0).monthdatescalendar(year, month):
+        days = []
+
+        for current_date in week:
+            days.append({
+                'date': current_date,
+                'in_month': current_date.month == month,
+                'tasks': tasks_by_date.get(current_date, []),
+            })
+
+        weeks.append(days)
+
+    return render(request, 'planner/calendar.html', {
+        'year': year,
+        'month': month,
+        'first_day': first_day,
+        'previous_month': previous_month if previous_month.year >= 1900 else None,
+        'next_month': next_month if next_month.year <= 2100 else None,
+        'weeks': weeks,
+        'today': today,
+        'selected_date': selected_date,
+        'selected_tasks': tasks_by_date.get(selected_date, []),
     })
 
 
@@ -122,6 +191,7 @@ def radar(request):
 
 
 
+
 def task_create(request):
     if request.method == 'POST':
         form = TaskForm(request.POST)
@@ -130,12 +200,22 @@ def task_create(request):
             task = form.save()
             return redirect('planner:task_detail', task_id=task.pk)
     else:
-        form = TaskForm()
+        initial = {}
+
+        try:
+            initial['deadline'] = date.fromisoformat(
+                request.GET.get('deadline', '')
+            )
+        except ValueError:
+            pass
+
+        form = TaskForm(initial=initial)
 
     return render(request, 'planner/task_form.html', {
         'form': form,
         'title': 'Новое задание',
     })
+
 
 
 def task_detail(request, task_id):

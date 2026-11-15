@@ -696,3 +696,165 @@ h1 {
         grid-template-columns: 1fr;
     }
 }
+
+/* Учебный календарь */
+
+.calendar-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.calendar-toolbar h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.calendar-today {
+    display: flex;
+    justify-content: center;
+    margin: 18px 0;
+}
+
+.calendar-scroll {
+    overflow-x: auto;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    min-width: 660px;
+}
+
+.weekday {
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 12px;
+}
+
+.calendar-day {
+    min-height: 120px;
+    padding: 9px;
+    border: 1px solid var(--border);
+    background: #f8fbff;
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+
+.calendar-day:hover {
+    background: #edf4ff;
+}
+
+.calendar-day.other-month {
+    background: #f3f5f8;
+    color: #b3bfcd;
+}
+
+.calendar-day.today {
+    border: 2px solid var(--primary);
+}
+
+.calendar-day.selected-day {
+    background: #e4efff;
+    border-color: var(--primary);
+}
+
+.day-number {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin-bottom: 7px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+a.day-number:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.today .day-number {
+    background: var(--primary);
+    color: white;
+}
+
+.calendar-task {
+    display: block;
+    padding: 6px 8px;
+    margin-bottom: 5px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.calendar-task:hover {
+    filter: brightness(0.94);
+}
+
+.event-active {
+    background: #dceaff;
+    color: #2868c7;
+}
+
+.event-completed {
+    background: #dff1e9;
+    color: #25805f;
+}
+
+.event-overdue {
+    background: #fce5e9;
+    color: #bf4555;
+}
+
+.calendar-legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 24px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.calendar-legend span {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.calendar-legend i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-active {
+    background: #2868c7;
+}
+
+.legend-completed {
+    background: #32967d;
+}
+
+.legend-overdue {
+    background: #cf6570;
+}
+
+#day-agenda .section-heading {
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+#day-agenda .section-heading h2 {
+    margin: 0;
+}

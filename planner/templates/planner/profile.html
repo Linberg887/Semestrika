@@ -1,0 +1,110 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}Мой профиль — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">ЛИЧНОЕ ПРОСТРАНСТВО</span>
+    <h1>Мой профиль</h1>
+    <p>Настрой Semestrika под себя.</p>
+</header>
+
+{% for message in messages %}
+    <div class="radar-notice notice-success">
+        {{ message }}
+    </div>
+{% endfor %}
+
+<section class="panel">
+
+    <div class="profile-heading">
+
+        <div class="profile-avatar">
+            {{ request.user.username|first|upper }}
+        </div>
+
+        <div>
+            <h2>{{ student_profile.display_name|default:request.user.username }}</h2>
+
+            <p class="muted">
+                Имя пользователя: {{ request.user.username }}
+            </p>
+
+            <p class="muted">
+                В Semestrika с {{ request.user.date_joined|date:"d.m.Y" }}
+            </p>
+        </div>
+
+    </div>
+
+    <div class="profile-statistics">
+
+        <a class="detail-item" href="{% url 'planner:subjects' %}">
+            <span>Дисциплины</span>
+            <strong class="blue">{{ subject_count }}</strong>
+        </a>
+
+        <a class="detail-item" href="{% url 'planner:tasks' %}">
+            <span>Всего заданий</span>
+            <strong class="blue">{{ task_count }}</strong>
+        </a>
+
+        <a class="detail-item"
+           href="{% url 'planner:tasks' %}?status=completed">
+            <span>Выполнено</span>
+            <strong class="green">{{ completed_count }}</strong>
+        </a>
+
+    </div>
+
+</section>
+
+<section class="panel form-panel">
+
+    <h2>Персональные настройки</h2>
+
+    <form method="post" class="task-form">
+
+        {% csrf_token %}
+
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+
+            <div class="form-field">
+
+                {% if field.name == 'daily_hours' %}
+                    <div class="profile-radar-label">
+                        ◎ Semestrika Radar
+                    </div>
+                {% endif %}
+
+                {{ field.label_tag }}
+                {{ field }}
+                {{ field.errors }}
+
+                {% if field.help_text %}
+                    <p class="muted">{{ field.help_text }}</p>
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn-primary">
+                Сохранить настройки
+            </button>
+
+            <a class="btn-secondary" href="{% url 'planner:radar' %}">
+                Открыть радар
+            </a>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

@@ -11,8 +11,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
-from .forms import TaskForm, SubjectForm
-from .models import Subject, Task
+from .forms import TaskForm, SubjectForm, ProfileForm
+from .models import Subject, Task, StudentProfile
+from django.contrib import messages
 
 
 def user_subjects(request):
@@ -137,10 +138,14 @@ def calendar(request):
 def radar(request):
     today = timezone.localdate()
     end_date = today + timedelta(days=6)
+    saved_limit = StudentProfile.objects.filter(
+        user=request.user
+    ).values_list('daily_hours', flat=True).first() or 4
+
     try:
-        daily_limit = int(request.GET.get('hours', 4))
+        daily_limit = int(request.GET.get('hours', saved_limit))
     except (ValueError, TypeError):
-        daily_limit = 4
+        daily_limit = saved_limit
     daily_limit = max(1, min(12, daily_limit))
     capacity = Decimal(daily_limit)
     zero = Decimal('0')
@@ -312,3 +317,31 @@ def register(request):
     else:
         form = UserCreationForm()
     return render(request, 'planner/auth.html', {'form': form, 'is_register': True})
+
+
+
+@login_required
+def profile(request):
+    student_profile, created = StudentProfile.objects.get_or_create(
+        user=request.user
+    )
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=student_profile)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Настройки успешно сохранены.')
+            return redirect('planner:profile')
+    else:
+        form = ProfileForm(instance=student_profile)
+
+    all_tasks = user_tasks(request)
+
+    return render(request, 'planner/profile.html', {
+        'form': form,
+        'student_profile': student_profile,
+        'subject_count': user_subjects(request).count(),
+        'task_count': all_tasks.count(),
+        'completed_count': all_tasks.filter(status='completed').count(),
+    })

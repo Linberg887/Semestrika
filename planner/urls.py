@@ -23,7 +23,7 @@ urlpatterns = [
 
     path('calendar/', views.calendar, name='calendar'),
     path('radar/', views.radar, name='radar'),
-
+    path('profile/', views.profile, name='profile'),
     path('register/', views.register, name='register'),
 
     path('login/', auth_views.LoginView.as_view(

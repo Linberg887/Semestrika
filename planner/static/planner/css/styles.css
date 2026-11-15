@@ -1180,3 +1180,67 @@ a.day-number:hover {
     background: #d1e3fa;
     color: var(--primary);
 }
+
+/* Личный кабинет студента */
+
+.profile-heading {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.profile-heading h2 {
+    font-size: 26px;
+    margin: 0;
+}
+
+.profile-avatar {
+    display: grid;
+    place-items: center;
+    width: 85px;
+    height: 85px;
+    flex-shrink: 0;
+    background: #dceaff;
+    color: var(--primary);
+    border-radius: 50%;
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.profile-statistics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.profile-statistics .detail-item {
+    transition: background 0.2s;
+}
+
+.profile-statistics .detail-item:hover {
+    background: #dceaff;
+}
+
+.profile-statistics strong {
+    font-size: 30px;
+}
+
+.profile-radar-label {
+    border-top: 1px solid var(--border);
+    padding-top: 22px;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.sidebar {
+    overflow-y: auto;
+}
+
+@media (max-width: 600px) {
+    .profile-statistics {
+        grid-template-columns: 1fr;
+    }
+}

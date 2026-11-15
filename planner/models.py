@@ -86,3 +86,34 @@ class Task(models.Model):
         verbose_name = 'Учебное задание'
         verbose_name_plural = 'Учебные задания'
         ordering = ['deadline']
+
+
+
+class StudentProfile(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='student_profile'
+    )
+
+    display_name = models.CharField(
+        'Отображаемое имя',
+        max_length=80,
+        blank=True
+    )
+
+    daily_hours = models.PositiveSmallIntegerField(
+        'Доступное время в день (часы)',
+        default=4,
+        validators=[
+            MinValueValidator(1),
+            MaxValueValidator(12)
+        ]
+    )
+
+    def __str__(self):
+        return self.user.username
+
+    class Meta:
+        verbose_name = 'Профиль студента'
+        verbose_name_plural = 'Профили студентов'

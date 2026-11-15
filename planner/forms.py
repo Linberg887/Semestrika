@@ -1,6 +1,6 @@
 
 from django import forms
-from .models import Task, Subject
+from .models import Task, Subject, StudentProfile
 
 
 class TaskForm(forms.ModelForm):
@@ -64,4 +64,28 @@ class SubjectForm(forms.ModelForm):
             'description': forms.Textarea(
                 attrs={'rows': 4}
             ),
+        }
+
+
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = StudentProfile
+
+        fields = [
+            'display_name',
+            'daily_hours',
+        ]
+
+        widgets = {
+            'display_name': forms.TextInput(
+                attrs={'placeholder': 'Как к тебе обращаться?'}
+            ),
+            'daily_hours': forms.NumberInput(
+                attrs={'min': 1, 'max': 12, 'step': 1}
+            ),
+        }
+
+        help_texts = {
+            'daily_hours': 'Используется в Semestrika Radar.',
         }

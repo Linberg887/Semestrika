@@ -44,6 +44,10 @@
        class="{% if request.resolver_match.url_name == 'radar' %}active{% endif %}">
         ◎ &nbsp; Радар нагрузки
     </a>
+    <a href="{% url 'planner:profile' %}"
+       class="{% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        ♙ &nbsp; Мой профиль
+    </a>
 </nav>
 
 <div class="account-panel">
@@ -53,7 +57,9 @@
     </div>
 
     <div class="account-info">
-        <strong>{{ request.user.username }}</strong>
+        <strong>
+    {{ request.user.student_profile.display_name|default:request.user.username }}
+</strong>
         <span>Личный аккаунт</span>
     </div>
 

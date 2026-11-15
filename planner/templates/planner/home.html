@@ -10,7 +10,11 @@
     <h1>Мой семестр</h1>
     <p>Организуй учёбу в своём ритме.</p>
 </header>
-
+<div class="page-actions">
+    <a class="btn-primary" href="{% url 'planner:task_create' %}">
+        + Новое задание
+    </a>
+</div>
 <section class="hero">
     <div>
         <span class="hero-label">ТВОЁ УЧЕБНОЕ ПРОСТРАНСТВО</span>
@@ -26,72 +30,84 @@
     </div>
 </section>
 
-<p class="demo-label">Предварительный обзор · Демонстрационные данные</p>
+<p class="demo-label">Твоя учебная статистика</p>
 
 <section class="statistics">
-    <div class="stat-card">
+    <a class="stat-card" href="{% url 'planner:tasks' %}">
         <span>Всего заданий</span>
-        <strong class="blue">12</strong>
-    </div>
-    <div class="stat-card">
+        <strong class="blue">{{ total_count }}</strong>
+    </a>
+
+    <a class="stat-card" href="{% url 'planner:tasks' %}?status=completed">
         <span>Выполнено</span>
-        <strong class="green">5</strong>
-    </div>
-    <div class="stat-card">
-        <span>В процессе</span>
-        <strong class="orange">6</strong>
-    </div>
-    <div class="stat-card">
+        <strong class="green">{{ completed_count }}</strong>
+    </a>
+
+    <a class="stat-card" href="{% url 'planner:tasks' %}?status=active">
+        <span>К выполнению</span>
+        <strong class="orange">{{ active_count }}</strong>
+    </a>
+
+    <a class="stat-card" href="{% url 'planner:tasks' %}?status=overdue">
         <span>Просрочено</span>
-        <strong class="red">1</strong>
-    </div>
+        <strong class="red">{{ overdue_count }}</strong>
+    </a>
 </section>
 
 <section class="panel">
     <div class="section-heading">
         <h2>Прогресс семестра</h2>
-        <strong class="blue">42%</strong>
+        <strong class="blue">{{ progress }}%</strong>
     </div>
+
     <div class="progress-bar">
-        <div class="progress-fill"></div>
+        <div class="progress-fill" style="width: {{ progress }}%;"></div>
     </div>
-    <p class="muted">5 из 12 заданий выполнено</p>
+
+    <p class="muted">
+        Выполнено заданий: {{ completed_count }} из {{ total_count }}
+    </p>
 </section>
 
 <section class="panel" id="tasks">
-    <h2>Ближайшие дедлайны</h2>
-
-    <div class="task">
-        <div class="task-info">
-            <strong>Разработка веб-проекта</strong>
-            <p>Веб-разработка</p>
-        </div>
-        <span class="deadline">20 ноября</span>
+    <div class="section-heading">
+        <h2>Ближайшие дедлайны</h2>
+        <a class="muted" href="{% url 'planner:tasks' %}">
+            Все задания →
+        </a>
     </div>
 
-    <div class="task">
-        <div class="task-info">
-            <strong>Подготовка презентации</strong>
-            <p>Управление проектами</p>
+    {% for task in upcoming_tasks %}
+        <div class="task">
+            <div class="task-info">
+                <a class="task-link" href="{% url 'planner:task_detail' task.id %}">
+    <strong>{{ task.title }}</strong>
+</a>
+                <p>{{ task.subject.name }}</p>
+            </div>
+            <span class="deadline">
+                {{ task.deadline|date:"d.m.Y" }}
+            </span>
         </div>
-        <span class="deadline">23 ноября</span>
-    </div>
-
-    <div class="task">
-        <div class="task-info">
-            <strong>Анализ научной статьи</strong>
-            <p>Методология исследований</p>
-        </div>
-        <span class="deadline">25 ноября</span>
-    </div>
+    {% empty %}
+        <p class="muted">Нет предстоящих заданий.</p>
+    {% endfor %}
 </section>
 
 <section class="panel" id="subjects">
-    <h2>Мои дисциплины</h2>
+    <div class="section-heading">
+        <h2>Мои дисциплины</h2>
+        <a class="muted" href="{% url 'planner:subjects' %}">
+            Все дисциплины →
+        </a>
+    </div>
+
     <div class="subjects">
-        <span>Веб-разработка</span>
-        <span>Управление проектами</span>
-        <span>Методология исследований</span>
+        {% for subject in subjects %}
+            <span>{{ subject.name }}</span>
+        {% empty %}
+            <p class="muted">Дисциплины пока не добавлены.</p>
+        {% endfor %}
     </div>
 </section>
 

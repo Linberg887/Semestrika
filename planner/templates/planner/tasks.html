@@ -1,0 +1,68 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}Мои задания — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">УЧЕБНЫЙ ПЛАН</span>
+    <h1>Мои задания</h1>
+    <p>Планируй задания и контролируй сроки сдачи.</p>
+</header>
+<div class="page-actions">
+    <a class="btn-primary" href="{% url 'planner:task_create' %}">
+        + Новое задание
+    </a>
+</div>
+<div class="task-filters">
+    <a class="deadline" href="{% url 'planner:tasks' %}">
+        Все задания
+    </a>
+    <a class="deadline" href="?status=completed">
+        Выполнено
+    </a>
+    <a class="deadline" href="?status=active">
+        К выполнению
+    </a>
+    <a class="deadline" href="?status=overdue">
+        Просрочено
+    </a>
+</div>
+
+<section class="panel">
+    <h2>Список учебных заданий</h2>
+
+    {% for task in tasks %}
+        <div class="task">
+            <div class="task-info">
+                <a class="task-link" href="{% url 'planner:task_detail' task.id %}">
+    <strong>{{ task.title }}</strong>
+</a>
+                <p>{{ task.subject.name }}</p>
+                <p>Приоритет: {{ task.get_priority_display }}</p>
+                <p>Время выполнения: {{ task.estimated_hours }} ч.</p>
+            </div>
+
+            <div class="task-meta">
+                <span class="deadline">
+                    {{ task.deadline|date:"d.m.Y" }}
+                </span>
+
+                {% if task.status == 'completed' %}
+                    <span class="green">Выполнено</span>
+                {% elif task.deadline < today %}
+                    <span class="red">Просрочено</span>
+                {% else %}
+                    <span class="orange">
+                        {{ task.get_status_display }}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    {% empty %}
+        <p class="muted">В этой категории пока нет заданий.</p>
+    {% endfor %}
+</section>
+
+{% endblock %}

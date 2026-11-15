@@ -1,0 +1,40 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}Удаление задания — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">УПРАВЛЕНИЕ ЗАДАНИЯМИ</span>
+    <h1>Удаление задания</h1>
+    <p>Подтверди своё действие.</p>
+</header>
+
+<section class="panel form-panel">
+    <div class="delete-warning">
+        <h2>Удалить задание?</h2>
+
+        <p>Ты собираешься удалить задание:</p>
+        <strong>{{ task.title }}</strong>
+
+        <p>Это действие нельзя будет отменить.</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <div class="form-actions">
+            <button type="submit" class="btn-danger">
+                Да, удалить
+            </button>
+
+            <a class="btn-secondary"
+               href="{% url 'planner:task_detail' task.id %}">
+                Отмена
+            </a>
+        </div>
+    </form>
+</section>
+
+{% endblock %}

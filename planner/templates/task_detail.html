@@ -1,0 +1,92 @@
+
+{% extends 'planner/base.html' %}
+
+{% block title %}{{ task.title }} — Semestrika{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <span class="eyebrow">УЧЕБНОЕ ЗАДАНИЕ</span>
+    <h1>{{ task.title }}</h1>
+    <p>{{ task.subject.name }}</p>
+</header>
+
+<section class="panel">
+    <h2>Информация о задании</h2>
+
+    <div class="detail-grid">
+
+        <div class="detail-item">
+            <span>Срок сдачи</span>
+            <strong>{{ task.deadline|date:"d.m.Y" }}</strong>
+        </div>
+
+        <div class="detail-item">
+            <span>Статус</span>
+
+            {% if task.status == 'completed' %}
+                <strong class="green">Выполнено</strong>
+            {% elif task.deadline < today %}
+                <strong class="red">Просрочено</strong>
+            {% else %}
+                <strong class="orange">
+                    {{ task.get_status_display }}
+                </strong>
+            {% endif %}
+        </div>
+
+        <div class="detail-item">
+            <span>Приоритет</span>
+            <strong>{{ task.get_priority_display }}</strong>
+        </div>
+
+        <div class="detail-item">
+            <span>Время выполнения</span>
+            <strong>{{ task.estimated_hours }} ч.</strong>
+        </div>
+
+    </div>
+</section>
+
+<section class="panel">
+    <h2>Описание задания</h2>
+
+    {% if task.description %}
+        {{ task.description|linebreaks }}
+    {% else %}
+        <p class="muted">Описание пока не добавлено.</p>
+    {% endif %}
+</section>
+
+
+<div class="task-actions">
+
+    <a class="btn-primary"
+       href="{% url 'planner:task_update' task.id %}">
+        Редактировать
+    </a>
+
+    {% if task.status != 'completed' %}
+        <form method="post"
+              action="{% url 'planner:task_complete' task.id %}">
+            {% csrf_token %}
+
+            <button type="submit" class="btn-success">
+                ✓ Выполнено
+            </button>
+        </form>
+    {% endif %}
+
+    <a class="btn-danger"
+       href="{% url 'planner:task_delete' task.id %}">
+        Удалить
+    </a>
+
+    <a class="btn-secondary" href="{% url 'planner:tasks' %}">
+        ← Все задания
+    </a>
+
+</div>
+
+{% endblock %}
+
